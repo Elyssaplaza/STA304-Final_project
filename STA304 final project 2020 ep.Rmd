@@ -207,6 +207,8 @@ Another weakness of this analysis was that the 2017 GSS dataset did not have a l
 
 In the future, I can look at data that takes into consideration online, phone, and in-person surveys of individuals who have voted liberal. This will be able to get an accurate logistic regression model and poststratification estimate due to more data being collected. The 2017 GSS dataset did not have a lot of similar variables as the 2019 Canadian Election Survey. Therefore, in the future, I can look at different census datasets that have more variables that are similar to the 2019 Canadian election survey. This will create more poststratification cells to increase the expressivity of the model. I can potentially find 2019 census data in order to find more similarities and to have a more up to date dataset that matches with the year of the survey data.
 
+Report can be found on: https://github.com/Elyssaplaza/STA304-Final_project
+
 ## References
 
 1. Caetano, Samantha: Poststratificationcode.R

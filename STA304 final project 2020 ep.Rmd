@@ -1,0 +1,218 @@
+---
+title: "Predicting the 2019 Canadian Federal Election if Everyone Voted"
+author: "Elyssa Plaza (1004356760)"
+date: "30/11/2020"
+output: 
+ pdf_document: default
+ html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, message=FALSE}
+
+library(opendatatoronto)
+library(cesR)
+library(tidyverse)
+library(visdat)
+library(skimr)
+
+#Loading in the survey and census data and cleaning the datasets 
+
+get_ces("ces2019_phone")
+
+head("ces2019_phone")
+
+ces_data_select <- ces2019_phone %>%
+  select(q2, q3, q4, q11, q12) %>%
+  mutate(q2 = 2019 - q2) %>%
+  mutate(likely_vote_liberal= 
+           ifelse(q11== 1, 1, 0)) %>%
+  mutate(maybe_vote_liberal= 
+           ifelse(q12 %in% c(NA, 2,3,4,5,6,7,8,9,10,-9), 0, 1))%>%
+  mutate(vote_liberal= likely_vote_liberal + maybe_vote_liberal) %>%
+  rename(age = q2,
+         gender = q3,
+         province = q4,
+         voted_party = q11,
+         potential_vote = q12)
+
+ces_data_select$province <- as.character(ces_data_select$province)
+ces_data_select$gender <- as.character(ces_data_select$gender)
+
+ces_data_select$gender[ces_data_select$gender == 1 ] = "Male"
+ces_data_select$gender[ces_data_select$gender == 2 ] = "Female"
+ces_data_select$gender[ces_data_select$gender == 3 ] = "Other"
+ces_data_select$province[ces_data_select$province == 1 ] = "Atlantic region"
+ces_data_select$province[ces_data_select$province == 2 ] = "Atlantic region"
+ces_data_select$province[ces_data_select$province== 3 ] = "Atlantic region"
+ces_data_select$province[ces_data_select$province == 4 ] = "Atlantic region"
+ces_data_select$province[(ces_data_select$province == 5)] = "Central Canada"
+ces_data_select$province[ces_data_select$province == 6 ] = "Central Canada"
+ces_data_select$province[ces_data_select$province == 7 ] = "Prairie Provinces"
+ces_data_select$province[ces_data_select$province == 8 ] = "Prairie Provinces"
+ces_data_select$province[ces_data_select$province== 9 ] = "Prairie Provinces"
+ces_data_select$province[ces_data_select$province == 10 ] = "West Coast"
+ces_data_select$province[ces_data_select$province == 11 ] = "North"
+ces_data_select$province[ces_data_select$province == 12 ] = "North"
+ces_data_select$province[ces_data_select$province == 13 ] = "North"
+ces_data_select$province[ces_data_select$province == -8 ] = "Refused"
+ces_data_select$province[ces_data_select$province == -9 ] = "Don't Know"
+
+gss_data <- read.csv("gss.csv")
+
+gss_select <- gss_data %>%
+  select(age, province, sex) 
+gss_select$age <- as.integer(gss_select$age)
+
+
+```
+## Abstract
+
+This data analysis builds a multilevel regression and poststratification (MRP) on the *2019 Canadian Election Study phone survey (CES)* data to identify if the 2019 Canadian Federal election results would have been different if everyone voted. The variables used in this analysis were age, gender, and province because these factors can highly influence one's vote. A logistic model was created for the *2019 Canadian Election Study phone survey (CES)* and the poststratification method was used for the *2017 General Social Survey on family (GSS)*. The results show that the estimate of individuals voting for the liberal party would be 28%. From the phone surveys, we learned that the liberal party would not have won if everyone voted. However, this may not be accurate because it only considers individuals who had answered the phone survey. There are individuals to consider, such as those who have not answered the phone or could not get a hold of the phone at the time the survey was conducted.
+
+## Keywords
+
+Multilevel Regression, Poststratification, 2019 Canadian Federal Election, Phone Survey, Census
+
+## Introduction
+
+The objective of this report is to identify the outcome of the 2019 federal election if everyone had voted. This report specifically looks at the individuals who voted and potentially wanted to vote for the liberal party. Moreover, the data collected is based on those who answered the 2019 Canadian Election Study phone survey during the campaign period. Identifying the outcome if everyone voted plays importance in politics. This can predict future outcomes of the federal elections and highlight the importance of voting. The 2019 CES dataset had gathered attitudes and opinions from Canadians during the 2019 federal election. Survey data from the 2019 CES aims to provide the trends in which party individuals vote given their age, reason, and gender (Stephenson, Laura B; Harell, Allison; Rubenson, Daniel; Loewen, Peter John, 2020).
+
+Multilevel regression with post-stratification (MRP) was used to identify who would have won the 2019 Canadian federal election if everyone voted. Multilevel Regression involves partitioning the data into demographic cells and estimating the response variable for each cell. The demographic cells were aggregated up to a population level. Each cell was grouped by the same age, gender, and province. Poststratification was used to estimate each cell in order to extrapolate how the entire population would vote (Caetano). The report used the 2019 CES phone survey and the 2017 GSS data datasets. The 2019 CES phone survey data was used to create a logistic regression model and 2017 GSS data was used to poststratify. This developed an estimate on whether the liberal party would have won if everyone voted. 
+
+In the methodology section, I will describe the two data sets that I used, which were a survey and census data. I will go into detail about how I analyzed the data and the poststratification value I got when estimating the cells. I will then display the logistic regression model that was created and explain why it was used. Results from the Multilevel Regression and poststratification estimate will be displayed in the results section. The discussion will summarize and conclude all my findings of the report and state the weaknesses that I incurred along with future steps. The final conclusions and inferences of the analysis will be presented in the Conclusion section.
+
+## Methodology 
+**Data**
+
+The 2019 CES phone survey was the dataset used to determine the results of the 2019 federal election if everyone had voted. The specific variables chosen from this are seen in Table 1. The survey dataset consists of variables including age, gender, province, voted party, potential voted party, and those who are likely to vote liberal. The other dataset used to determine the 2019 federal election vote was the 2017 General social survey on family (GSS) dataset used as the census data. Table 2 demonstrates the GSS dataset and the specific variables used. The variables used form this dataset were age, sex, and province. The reason for choosing age was because age can influence one’s vote due to the different the beliefs one was born with during that period. Gender and province can influence one’s vote depending on how the political party acts towards one’s gender or province. The survey data and census data are to be used in MRP’s,
+
+
+```{r, message=FALSE}
+library(knitr)
+kable(ces_data_select[1:7, ], caption = "Table 1. 2019 Canadian Election Study Phone Survey")
+```
+
+
+
+
+```{r, message=FALSE}
+kable(gss_select[1:7, ], caption = "Table 2. 2017 General Social Survey on family")
+```
+
+**Model**
+
+A logistic regression model was used to formulate those who voted Liberal in the 2019 Canadian federal election. This logistic model was based on the 2019 CES dataset using the variables age, gender, and province. The reason for choosing a logistic regression model is because the response variable (vote_liberal) is a binary outcome. A logistic model is best at representing either a binary outcome, which is an outcome of either Yes (=1) or No (=0).
+
+$$ log(\frac{\hat{p}}{1-\hat{p}})= \beta_0+ \beta_1x_{age}+\beta_2x_{gendeMale} + \beta_3x_{pronvinceAtlanticregion} + \beta_4x_{genderOther} $$
+
+$$+ \beta_5x_{pronvinceCentralCanada} + \beta_6x_{pronvincePrairieProvinces} + \beta_7x_{pronvinceWestCoast}$$
+Model 1. Logistic Regression Model of those in favour of the liberal party
+
+${\hat{p}}$ is the estimated percentage of those who would vote for the liberal party. $\beta_0$ is the intercept of the model. $\beta_{1}$ to $\beta_{7}$ represents the slope of the model.
+
+The variables chosen are based on what would influence the vote the most, these were age, gender, and provinces. As stated earlier, these factors can highly influence a vote because ones political views can be influenced during the time they were born. An individual will also be influenced to vote depending on how the party interacts with their gender or province.
+
+
+## Results
+
+The logistic model demonstrates the equation of those in favor of the liberal party (Model 1). This was modeled by the following logistic regression model using the variables, age, gender, and province. The provinces are divided by Atlantic Region (Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick), Central Canada (Ontario and Quebec), Prairie Provinces (Manitoba, Saskatchewan, and Alberta), West Coast (British Columbia), and North (Nunavut, Northwest Territories, and Yukon Territory). Model 2 summarizes the logistic model.
+
+```{r, message=FALSE}
+library(broom)
+
+#Creating the logistic regression model
+
+temp <- ces_data_select[!is.na(ces_data_select$vote_liberal),]
+
+temp %>% 
+  summarize(raw_liberal_prop = sum(temp$vote_liberal) / nrow(temp))
+
+liberal_estimate<-glm(vote_liberal ~ age + gender + province, data=temp, family="binomial")
+
+kable(broom::tidy(liberal_estimate)[1:7, ], caption = "Model 2. Summary of logistic regression model")
+```
+
+This logistic model represents that the p-values are very small, lower than the significance level of 0.05, making the variables statistically significant. The statistically significant variables, age, gender, and province, mean that they will have a significant impact on the liberal party vote. We can see that for one unit increase of age there will a 0.0062 increase in the log odds for voting liberal. For one unit increase of genderMale there will be a 0.135 decrease in the log odds and for genderOther there will be a 10.265 decrease in log odds for voting liberal. For one unit increase in provinceCentral Canada (Ontario and Quebec) there will be an increase of 0.044 in the log odds, one unit increase in provincePrairie Provinces will have a 0.842 decrease in the log odds, and a one-unit increase in provinceWest Coast will have a 0.446 decrease in the log odds for voting liberal. This creates a formula of:
+
+**y = -1.02 + age(0.006) + genderMale(-0.13) + genderOther(-10.265) + provinceCentraCanada(0.044) + provincePrairieProvinces(-.842)**
+
+
+Through the use of poststratification, I created cells based on age, gender, and province (Table 3). I estimated that the proportion voting for the liberal party would be 0.282 (28%), implying that the liberal party would have not won in the 2019 Canadian federal election if everyone had voted. These results are taken from post-stratification analysis specifically those in favor of the liberal party.
+```{r, message=FALSE}
+
+#Creating Census dataset and cleaning up the dataset 
+
+gss_select <- gss_data %>%
+  select(age, province, sex)%>%
+  count(age, province, sex) %>%
+  rename(gender = sex)
+
+gss_select$province[gss_select$province == "Newfoundland and Labrador" ] = "Atlantic region"
+gss_select$province[gss_select$province == "Prince Edward Island" ] = "Atlantic region"
+gss_select$province[gss_select$province == "Nova Scotia" ] = "Atlantic region"
+gss_select$province[gss_select$province == "New Brunswick" ] = "Atlantic region"
+gss_select$province[gss_select$province == "Quebec" ] = "Central Canada"
+gss_select$province[gss_select$province == "Ontario" ] = "Central Canada"
+gss_select$province[gss_select$province == "Manitoba" ] = "Prairie Provinces"
+gss_select$province[gss_select$province == "Saskatchewan" ] = "Prairie Provinces"
+gss_select$province[gss_select$province == "Alberta" ] = "Prairie Provinces"
+gss_select$province[gss_select$province == "British Columbia" ] = "West Coast"
+gss_select$province[gss_select$province == "Nunavut" ] = "North"
+gss_select$province[gss_select$province == "Northwest Territories" ] = "North"
+gss_select$province[gss_select$province == "Yukon Territory" ] = "North"
+
+
+gss_select$age <- as.integer(gss_select$age)
+
+
+gss_select$logodds_estimate <-
+  liberal_estimate %>%
+  predict(newdata = gss_select)
+
+kable(gss_select[1:6, ], caption = "Table 3. Poststratification estimate of liberal party votes")
+
+
+gss_select$estimate <- exp(gss_select$logodds_estimate)/(1+exp(gss_select$logodds_estimate))
+
+gss_select %>%
+  mutate(liberal_predict_prop = estimate*n) %>% 
+  summarise(liberal_predict = sum(liberal_predict_prop)/sum(n))
+
+
+```
+
+ 
+## Discussion 
+**Summary**
+
+I used a logistic regression model for the 2019 Canadian Election Study phone survey data (CES) and the 2017 General Social Survey data (GSS) to estimate for poststratification to determine the outcome of the 2019 federal election if everyone had voted. The variables that were used were age, gender, and province. The provinces were divided by region, Atlantic Region (Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick), Central Canada (Ontario and Quebec), Prairie Provinces (Manitoba, Saskatchewan, Alberta), West Coast (British Columbia), and North (Nunavut, Northwest Territories, Yukon Territory). Age, Gender, and province were statistically significant and were influential on the decision for liberal votes. From my analysis, I found that the proportion for all individuals voting for the liberal party would be 28%. Moreover, this sample could imply that the liberal party would not have won if everyone voted in the 2019 federal election. 
+
+**Conclusions**
+
+In conclusion, the poststratification calculated estimate was 0.2823343. Therefore, 28% of Canadians are in favor of voting for the labor party for the 2019 Canadian federal election. The results mean that the liberal party will lose in the 2019 election if everyone voted. However, this election has already occurred and the liberal party had won. These results mainly demonstrate 28% of Canadians are in favor of voting for the labor party who had answered the phone survey.
+
+The impacts of predicting the votes will help us to understand the importance of everyone voting in the election and how one simple vote can go a long way. In addition to that, predicting the outcome of votes can be used for future elections to determine which party will be winning in any future elections.
+
+**Weaknesses**
+
+The data collected for those who voted liberal was only from individuals who answered the 2019 Canadian Election Study phone survey. This was a weakness because everyone may not have been able to answer the phone during the time the survey was conducted. There may be individuals who missed the phone survey and would have voted liberal. On top of that, individuals may not be able to get a hold of a phone to participate in the phone survey. Therefore, the phone survey did not take into consideration for everyone voting liberal. There was also an online survey of the 2019 Canadian Election Study. These surveys included those who were voting liberal or not. This would be important information for this analysis because it would increase the likelihood of the liberal party winning. Furthermore, there is a lot of missing data, therefore including a lot of bias in the model.
+  
+Another weakness of this analysis was that the 2017 GSS dataset did not have a lot of similar variables as the 2019 Canadian Election Survey data. Therefore, a lot of variables for the logistic regression model and the poststratification cells had to be reduced. There was no ability to put financial income because it was not available in the 2019 CES dataset. This could have been an important factor in how an individual was voting. Removing the number of variables can reduce the expressivity of the model. 
+	
+## Next Steps
+
+In the future, I can look at data that takes into consideration online, phone, and in-person surveys of individuals who have voted liberal. This will be able to get an accurate logistic regression model and poststratification estimate due to more data being collected. The 2017 GSS dataset did not have a lot of similar variables as the 2019 Canadian Election Survey. Therefore, in the future, I can look at different census datasets that have more variables that are similar to the 2019 Canadian election survey. This will create more poststratification cells to increase the expressivity of the model. I can potentially find 2019 census data in order to find more similarities and to have a more up to date dataset that matches with the year of the survey data.
+
+## References
+
+1. Caetano, Samantha: Poststratificationcode.R
+
+2. Caetano, Samantha: Lecture 6
+
+3. “General Social Survey, Cycle 31 : Families.” Statistics Canada, Minister Responsible for Statistics Canada, sda-artsci-utoronto-ca.myaccess.library.utoronto.ca/sdaweb/dli2/gss/gss31/gss31/more_doc/GSS31_User_Guide.pdf. 
+
+4. Stephenson, Laura B; Harell, Allison; Rubenson, Daniel; Loewen, Peter John, 2020, '2019 Canadian Election Study - Phone Survey', https://doi.org/10.7910/DVN/8RHLG1, Harvard Dataverse, V1, UNF:6:eyR28qaoYlHj9qwPWZmmVQ== [fileUNF]

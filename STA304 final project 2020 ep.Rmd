@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r, message=FALSE}
-
 library(opendatatoronto)
 library(cesR)
 library(tidyverse)
@@ -187,7 +186,7 @@ gss_select %>%
 ```
 
 
-
+\\
  
 ## Discussion 
 **Summary**
@@ -218,10 +217,9 @@ In the future, I can look at data that takes into consideration online, phone, a
 
 2. Caetano, Samantha: Lecture 6
 
-3. David W. Hosmer and Stanley Lemeshow. Goodness of fit tests for the multiple logistic
-regression model. Communications in Statistics - Theory and Methods, 9(10):1043–1069,
-1980.
+3. David W. Hosmer and Stanley Lemeshow. Goodness of fit tests for the multiple logistic regression model. Communications in Statistics - Theory and Methods, 9(10):1043–1069, 1980.
 
-4. “General Social Survey, Cycle 31 : Families.” Statistics Canada, Minister Responsible for Statistics Canada, sda-artsci-utoronto-ca.myaccess.library.utoronto.ca/sdaweb/dli2/gss/gss31/gss31/more_doc/GSS31_User_Guide.pdf. 
+4. “General Social Survey, Cycle 31 : Families.” Statistics Canada, Minister Responsible for Statistics Canada, sda-artsci-utoronto-ca.myaccess.library.utoronto.ca/sdaweb/dli2/gss/gss31/gss31/more_doc/
+GSS31_User_Guide.pdf. 
 
 5. Stephenson, Laura B; Harell, Allison; Rubenson, Daniel; Loewen, Peter John, 2020, '2019 Canadian Election Study - Phone Survey', https://doi.org/10.7910/DVN/8RHLG1, Harvard Dataverse, V1, UNF:6:eyR28qaoYlHj9qwPWZmmVQ== [fileUNF]

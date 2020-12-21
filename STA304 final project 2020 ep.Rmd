@@ -71,7 +71,7 @@ gss_select$age <- as.integer(gss_select$age)
 ```
 ## Abstract
 
-This data analysis builds a multilevel regression and poststratification (MRP) on the *2019 Canadian Election Study phone survey (CES)* data to identify if the 2019 Canadian Federal election results would have been different if everyone voted. The variables used in this analysis were age, gender, and province because these factors can highly influence one's vote. A logistic model was created for the *2019 Canadian Election Study phone survey (CES)* and the poststratification method was used for the *2017 General Social Survey on family (GSS)*. The results show that the estimate of individuals voting for the liberal party would be 28%. From the phone surveys, we learned that the liberal party would not have won if everyone voted. However, this may not be accurate because it only considers individuals who had answered the phone survey. There are individuals to consider, such as those who have not answered the phone or could not get a hold of the phone at the time the survey was conducted.
+This data analysis builds a multilevel regression and poststratification (MRP) on the *2019 Canadian Election Study phone survey (CES)* data to identify if the 2019 Canadian Federal election results would have been different if everyone voted. The variables used in this analysis were age, gender, and province because these factors can highly influence one's vote. A logistic model was created for the *2019 Canadian Election Study phone survey (CES)* and the poststratification method was used for the *2017 General Social Survey on family (GSS)*. The results show that the estimate of individuals voting for the liberal party would be 28%. From the phone surveys, we learned that the liberal party would not have won if everyone voted. However, this may not be accurate because it only considers individuals who had answered the phone survey. There are individuals to consider, such as those who have not answered the phone or could not get a hold of the phone at the time the survey was conducted. Code and data supporting this analysis is available at: https://github.com/Elyssaplaza/STA304-Final_project
 
 ## Keywords
 
@@ -88,7 +88,7 @@ In the methodology section, I will describe the two data sets that I used, which
 ## Methodology 
 **Data**
 
-The 2019 CES phone survey was the dataset used to determine the results of the 2019 federal election if everyone had voted. The specific variables chosen from this are seen in Table 1. The survey dataset consists of variables including age, gender, province, voted party, potential voted party, and those who are likely to vote liberal. The other dataset used to determine the 2019 federal election vote was the 2017 General social survey on family (GSS) dataset used as the census data. Table 2 demonstrates the GSS dataset and the specific variables used. The variables used form this dataset were age, sex, and province. The reason for choosing age was because age can influence one’s vote due to the different the beliefs one was born with during that period. Gender and province can influence one’s vote depending on how the political party acts towards one’s gender or province. The survey data and census data are to be used in MRP’s,
+The 2019 CES phone survey was the dataset used to determine the results of the 2019 federal election if everyone had voted. The specific variables chosen from this are seen in Table 1. The survey dataset consists of variables including age, gender, province, voted party, potential voted party, and those who are likely to vote liberal. The other dataset used to determine the 2019 federal election vote was the 2017 General social survey on family (GSS) dataset used as the census data. Table 2 demonstrates the GSS dataset and the specific variables used. The variables used form this dataset were age, sex, and province. Age was not divided up into any age groups. The reason for choosing age was because age can influence one’s vote due to the different the beliefs one was born with during that period. Gender was divided by Male, Female, and Other, and Provinces were divided by regions. Gender and province were chosen as they can influence one’s vote depending on how the political party acts towards one’s gender or province. The survey data and census data are to be used in MRP. The data collected were from individuals who answered the phone survey and were found by calling all Canadians. The population are Canadians voting. The frame population are the Canadians who have a phone. The sample population are the individuals who had answered the phone survey. Because the phone survey only collects data from Canadians answering the phone the results cannot fully confirm what the outcome of the 2019 federal election would be if everyone voted. This was a weakness because I only took into account those who answered the phone survey instead of using in-person or an online survey as well. However, a strength of this dataset is that I was able to gather basic yet important variables, age, sex, and province, from the datasets which would help the expressivity of this model.
 
 
 ```{r, message=FALSE}
@@ -105,7 +105,7 @@ kable(gss_select[1:7, ], caption = "Table 2. 2017 General Social Survey on famil
 
 **Model**
 
-A logistic regression model was used to formulate those who voted Liberal in the 2019 Canadian federal election. This logistic model was based on the 2019 CES dataset using the variables age, gender, and province. The reason for choosing a logistic regression model is because the response variable (vote_liberal) is a binary outcome. A logistic model is best at representing either a binary outcome, which is an outcome of either Yes (=1) or No (=0).
+A logistic regression model was used to formulate those who voted Liberal in the 2019 Canadian federal election. This logistic model was based on the 2019 CES dataset using the variables age, gender, and province. The reason for choosing a logistic regression model is because the response variable (vote_liberal) is a binary outcome. A logistic model is best at representing a binary outcome, which is an outcome of either Yes (=1) or No (=0). The software I used to run this model was R studio.
 
 $$ log(\frac{\hat{p}}{1-\hat{p}})= \beta_0+ \beta_1x_{age}+\beta_2x_{gendeMale} + \beta_3x_{pronvinceAtlanticregion} + \beta_4x_{genderOther} $$
 
@@ -114,8 +114,9 @@ Model 1. Logistic Regression Model of those in favour of the liberal party
 
 ${\hat{p}}$ is the estimated percentage of those who would vote for the liberal party. $\beta_0$ is the intercept of the model. $\beta_{1}$ to $\beta_{7}$ represents the slope of the model.
 
-The variables chosen are based on what would influence the vote the most, these were age, gender, and provinces. As stated earlier, these factors can highly influence a vote because ones political views can be influenced during the time they were born. An individual will also be influenced to vote depending on how the party interacts with their gender or province.
+The variables chosen are based on what would influence the vote the most, these were age, gender, and provinces. Age was used instead of age groups to get a general sense of what specific age would be voting in phone surveys. The provinces were divided by regions to minimize the variables used in the model or else there would have been too many variables for provinces. There were three options for gender because the 2019 CES phone survey data provided only three options to identify the individual's gender which was either male, female, or other. The other options were "refuse to answer" or "don't know". As stated earlier, these factors can highly influence a vote because ones political views can be influenced during the time they were born. An individual will also be influenced to vote depending on how the party interacts with their gender or province.
 
+The strength of this logistic regression model is that it is appropriate for binary outcomes. It would also be able to calculate a percentage of how many individuals would vote Liberal. The weakness of this model is that there aren't many variables used as it only focuses on age, gender, and province. Variables such as income would make the model more expressive. However, meaningful variables that exist in the census data don't exist in the survey data, and because there are no similar variables in the survey and census data they cannot be used for the model. An alternative model that could have been used instead of the logistic regression model could be a Log-binomial model. Log-binomial models also take into account binary outcomes. This is because a log-binomial model makes the assumption of a linear increase on a log scale (David W. Hosmer and Stanley Lemeshow).
 
 ## Results
 
@@ -185,11 +186,14 @@ gss_select %>%
 
 ```
 
+
+
  
 ## Discussion 
 **Summary**
 
-I used a logistic regression model for the 2019 Canadian Election Study phone survey data (CES) and the 2017 General Social Survey data (GSS) to estimate for poststratification to determine the outcome of the 2019 federal election if everyone had voted. The variables that were used were age, gender, and province. The provinces were divided by region, Atlantic Region (Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick), Central Canada (Ontario and Quebec), Prairie Provinces (Manitoba, Saskatchewan, Alberta), West Coast (British Columbia), and North (Nunavut, Northwest Territories, Yukon Territory). Age, Gender, and province were statistically significant and were influential on the decision for liberal votes. From my analysis, I found that the proportion for all individuals voting for the liberal party would be 28%. Moreover, this sample could imply that the liberal party would not have won if everyone voted in the 2019 federal election. 
+I used a logistic regression model (Model 2) for the 2019 Canadian Election Study phone survey data (CES) and the 2017 General Social Survey data (GSS) to estimate for poststratification to determine the outcome of the 2019 federal election if everyone had voted. The variables that were used were age, gender, and province. The provinces were divided by region, Atlantic Region (Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick), Central Canada (Ontario and Quebec), Prairie Provinces (Manitoba, Saskatchewan, Alberta), West Coast (British Columbia), and North (Nunavut, Northwest Territories, Yukon Territory). Age, Gender, and province were statistically significant and were influential on the decision for liberal votes. From my analysis, I found that the proportion for all individuals voting for the liberal party would be 28%. Moreover, this sample could imply that the liberal party would not have won if everyone voted in the 2019 federal election.
+
 
 **Conclusions**
 
@@ -207,7 +211,6 @@ Another weakness of this analysis was that the 2017 GSS dataset did not have a l
 
 In the future, I can look at data that takes into consideration online, phone, and in-person surveys of individuals who have voted liberal. This will be able to get an accurate logistic regression model and poststratification estimate due to more data being collected. The 2017 GSS dataset did not have a lot of similar variables as the 2019 Canadian Election Survey. Therefore, in the future, I can look at different census datasets that have more variables that are similar to the 2019 Canadian election survey. This will create more poststratification cells to increase the expressivity of the model. I can potentially find 2019 census data in order to find more similarities and to have a more up to date dataset that matches with the year of the survey data.
 
-Report can be found on: https://github.com/Elyssaplaza/STA304-Final_project
 
 ## References
 
@@ -215,6 +218,10 @@ Report can be found on: https://github.com/Elyssaplaza/STA304-Final_project
 
 2. Caetano, Samantha: Lecture 6
 
-3. “General Social Survey, Cycle 31 : Families.” Statistics Canada, Minister Responsible for Statistics Canada, sda-artsci-utoronto-ca.myaccess.library.utoronto.ca/sdaweb/dli2/gss/gss31/gss31/more_doc/GSS31_User_Guide.pdf. 
+3. David W. Hosmer and Stanley Lemeshow. Goodness of fit tests for the multiple logistic
+regression model. Communications in Statistics - Theory and Methods, 9(10):1043–1069,
+1980.
 
-4. Stephenson, Laura B; Harell, Allison; Rubenson, Daniel; Loewen, Peter John, 2020, '2019 Canadian Election Study - Phone Survey', https://doi.org/10.7910/DVN/8RHLG1, Harvard Dataverse, V1, UNF:6:eyR28qaoYlHj9qwPWZmmVQ== [fileUNF]
+4. “General Social Survey, Cycle 31 : Families.” Statistics Canada, Minister Responsible for Statistics Canada, sda-artsci-utoronto-ca.myaccess.library.utoronto.ca/sdaweb/dli2/gss/gss31/gss31/more_doc/GSS31_User_Guide.pdf. 
+
+5. Stephenson, Laura B; Harell, Allison; Rubenson, Daniel; Loewen, Peter John, 2020, '2019 Canadian Election Study - Phone Survey', https://doi.org/10.7910/DVN/8RHLG1, Harvard Dataverse, V1, UNF:6:eyR28qaoYlHj9qwPWZmmVQ== [fileUNF]
